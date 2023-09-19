@@ -1,0 +1,153 @@
+---
+title: "Praktikum 03 - Regresi dengan Peubah Lag"
+author:
+- Angga Fathan Rofiqy (G1401211006)
+output:
+  html_document:
+    theme: yeti
+    toc: true
+    toc_float: true
+---
+
+# I. Setting
+
+Abaikan bagian ini. Lansung saja loncat ke `Tentang Data` . `Function` biar gak perlu ganti `backslash` (`\`) jadi `slash` (`/`).
+
+```{r}
+path <- function() gsub  ( "\\\\",  "/",  readClipboard ()  )
+#Copy path, Panggil function di console
+#Copy r path, paste ke var yang diinginkan
+```
+
+`Function` biar gak perlu repot buat `install("")` atau `load()` *package.*
+
+```{r}
+#                      -=( Install & Load Package Function )=-
+install_load <- function (package1, ...)  {   
+
+   # convert arguments to vector
+   packages <- c(package1, ...)
+
+   # start loop to determine if each package is installed
+   for(package in packages){
+
+       # if package is installed locally, load
+       if(package %in% rownames(installed.packages()))
+          do.call('library', list(package))
+
+       # if package is not installed locally, download, then load
+       else {
+          install.packages(package)
+          do.call("library", list(package))
+       }
+   } 
+}
+```
+
+**SET Working Directory**
+
+```{r setup, include=FALSE, echo=FALSE}
+require("knitr")
+opts_knit$set(root.dir = "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/4. Regresi Spasial/03")
+```
+
+# A. Tentang Data
+
+Data yang digunakan adalah Data Demografi Kabupaten Sukabumi tahun 2019 yang meliputi `Jumlah Penduduk`, `Kepadatan Penduduk`,  `Jumlah Desa dan Kelurahan`, Dan `Luas Wilayah`. Data bersumber dari Badan Pusat Statistik dengan jumlah kecamatan sebanyak $47$ kecamatan.
+
+***Source :***
+
+-   `Jumlah Penduduk` : [Jumlah Penduduk Kabupaten Sukabumi Per Kecamatan (2019)](https://sukabumikab.bps.go.id/statictable/2020/06/16/354/data-penduduk-berdasarkan-jenis-kelamin-menurut-kecamatan-di-kabupaten-sukabumi-semester-ii-tahun-2019-.html)
+
+-   `Kepadatan Penduduk` : [Kepadatan Penduduk Kabupaten Sukabumi Per Kecamatan (2019)](https://sukabumikab.bps.go.id/indicator/12/77/1/kepadatan-penduduk-kabupaten-sukabumi-.html)
+
+-   `Jumlah Desa dan Kelurahan` : [Jumlah Desa dan Kelurahan Kabupaten Sukabumi Per kecamatan (2019)](https://profilbaru.com/Daftar_kecamatan_dan_kelurahan_di_Kabupaten_Sukabumi#:~:text=Kabupaten%20Sukabumi%20terdiri%20dari%2047,sebaran%20penduduk%20609%20jiwa%2Fkm%C2%B2.)
+
+-   `Kode BPS & Kode Kemendagri` : [Kode BPS & Kode Kemendagri Kabupaten Sukabumi](https://sig.bps.go.id/bridging-kode/index)
+
+-   `Luas Wilayah` : [Luas Wilayah Kabupaten Sukabumi Per Kecamatan (2019)](https://sukabumikab.bps.go.id/statictable/2020/06/16/355/luas-daerah-dan-jumlah-pulau-menurut-kecamatan-2019-.html)
+
+### Import Data Demografi Kabupaten Sukabumi
+
+```{r}
+install_load('rio')
+raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/main/Pertemuan%203/salesmonthly.csv")
+```
+
+```{r}
+raw.data <- read.csv("data.csv", sep=";")
+```
+
+```{r}
+install_load('dplyr','kableExtra')
+kable(head(raw.data)) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE)
+```
+
+### Import Data Spasial
+
+*Shapefile* diperoleh dari website [data.humdata.org](https://data.humdata.org/). Membaca data dapat dilakukan dengan menggunakan fungsi `st_read()` dari paket `sf`.
+
+```{r}
+install_load('sf')
+map_indonesia <- st_read("idn_adm_bps_20200401_shp/idn_admbnda_adm3_bps_20200401.shp", quiet = TRUE)
+```
+
+**Gambaran data.**
+
+```{r}
+kable(head(map_indonesia)) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE)
+```
+
+### Merged Data
+
+Selanjutnya akan dilakukan merged data peubah `Kode BPS` dari `data`, dan peubah `ADM3_PCODE` dari `map_indonesia`.
+
+```{r}
+mapBogor <- map_indonesia %>%
+  inner_join(dataBogor, by = c("ADM3_PCODE" = "Kode BPS"))
+
+kable(head(mapBogor)) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = FALSE)
+```
+
+Data spasial dan informasi Demografi Kabupaten Sukabumi sudah tersedia dalam satu dataframe. Untuk menyajikan dalam peta choropleth, beberapa paket R dapat digunakan, salah satunya paket `ggplot2` dengan fungsi `geom_sf()`.
+
+# B. **Visualisasi Geospasial**
+
+## 1. Visualisasi Normal
+
+Konsep dari `ggplot2` dalam visualisasi data adalah dengan mengkombinasikan data, stat dan geom atau layer. Pada perintah berikut, `ggplot()` akan menginisiasi layer kosong yang siap ditambahkan layer-layer lain diatasnya. Lalu `geom_sf()` akan memetakan data `data`, di mana setiap area/poligon akan diberi gradasi warna sesuai nilai pada kolom JumlahPenduduk.
+
+### i. Jumlah Penduduk Kabupaten Bogor
+
+```{r dpi=300, fig1, fig.height = 9, fig.width = 16, fig.align = "center"}
+install_load('ggplot2')
+Jumlah_Penduduk <- ggplot() +  
+  geom_sf(data=mapBogor, aes(fill=`Jumlah Penduduk`)) +
+  theme_minimal()
+Jumlah_Penduduk
+```
+
+Selain kolom `Jumlah Penduduk`, dapat digunakan kolom `Kepadatan Penduduk` untuk menggambarkan permasalahan kependudukan di Kabupaten Sukabumi.
+
+### ii. Kepadatan Penduduk Kabupaten Bogor
+
+```{r dpi=300, fig2, fig.height = 9, fig.width = 16, fig.align = "center"}
+Kepadatan_Penduduk <- ggplot() +  
+  geom_sf(data=mapBogor, aes(fill=`Kepadatan Penduduk`)) +
+  theme_minimal()
+Kepadatan_Penduduk
+```
+
+Sebagai tambahan, disajikan juga data `Jumlah Desa dan Kelurahan` yang ada di Kabupaten Sukabumi.
+
+### iii. Jumlah Desa & Kelurahan Kabupaten Bogor
+
+```{r dpi=300, fig3, fig.height = 9, fig.width = 16, fig.align = "center"}
+DesaKelurahan <- ggplot() +  
+  geom_sf(data=mapBogor, aes(fill=`Jumlah Desa dan Kelurahan`)) +
+  theme_minimal()
+DesaKelurahan
+```
