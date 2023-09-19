@@ -57,6 +57,8 @@ Data yang digunakan adalah Data Demografi Kabupaten Sukabumi tahun 2019 yang mel
 
 ***Source :***
 
+-   **Github :** [Github Tugas Praktikum Pekan 3 Regresi Spasial Angga Fathan Rofiqy](https://github.com/Zen-Rofiqy/STA1352-RegSpas/tree/main/03)
+
 -   `Jumlah Penduduk` : [Jumlah Penduduk Kabupaten Sukabumi Per Kecamatan (2019)](https://sukabumikab.bps.go.id/statictable/2020/06/16/354/data-penduduk-berdasarkan-jenis-kelamin-menurut-kecamatan-di-kabupaten-sukabumi-semester-ii-tahun-2019-.html)
 
 -   `Kepadatan Penduduk` : [Kepadatan Penduduk Kabupaten Sukabumi Per Kecamatan (2019)](https://sukabumikab.bps.go.id/indicator/12/77/1/kepadatan-penduduk-kabupaten-sukabumi-.html)
@@ -71,11 +73,8 @@ Data yang digunakan adalah Data Demografi Kabupaten Sukabumi tahun 2019 yang mel
 
 ```{r}
 install_load('rio')
-raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1341-MPDW/main/Pertemuan%203/salesmonthly.csv")
-```
-
-```{r}
-raw.data <- read.csv("data.csv", sep=";")
+raw.data <- 
+  import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1352-RegSpas/main/03/data.csv")
 ```
 
 ```{r}
@@ -102,13 +101,15 @@ kable(head(map_indonesia)) %>%
 
 ### Merged Data
 
-Selanjutnya akan dilakukan merged data peubah `Kode BPS` dari `data`, dan peubah `ADM3_PCODE` dari `map_indonesia`.
+Selanjutnya akan dilakukan merged data peubah `Kode BPS` `raw.data` degan tambahan `ID` di depannya dan peubah `ADM3_PCODE` dari `map_indonesia`.
 
 ```{r}
-mapBogor <- map_indonesia %>%
-  inner_join(dataBogor, by = c("ADM3_PCODE" = "Kode BPS"))
+mapSukabumi <- map_indonesia %>%
+  inner_join(raw.data %>%
+                mutate(`Kode BPS` = paste0("ID", `Kode BPS`))
+             , by = c("ADM3_PCODE" = "Kode BPS"))
 
-kable(head(mapBogor)) %>% 
+kable(head(mapSukabumi)) %>% 
   kable_styling(bootstrap_options = "striped", full_width = FALSE)
 ```
 
@@ -120,34 +121,204 @@ Data spasial dan informasi Demografi Kabupaten Sukabumi sudah tersedia dalam sat
 
 Konsep dari `ggplot2` dalam visualisasi data adalah dengan mengkombinasikan data, stat dan geom atau layer. Pada perintah berikut, `ggplot()` akan menginisiasi layer kosong yang siap ditambahkan layer-layer lain diatasnya. Lalu `geom_sf()` akan memetakan data `data`, di mana setiap area/poligon akan diberi gradasi warna sesuai nilai pada kolom JumlahPenduduk.
 
-### i. Jumlah Penduduk Kabupaten Bogor
+### i. Jumlah Penduduk Kabupaten Sukabumi
 
 ```{r dpi=300, fig1, fig.height = 9, fig.width = 16, fig.align = "center"}
 install_load('ggplot2')
 Jumlah_Penduduk <- ggplot() +  
-  geom_sf(data=mapBogor, aes(fill=`Jumlah Penduduk`)) +
+  geom_sf(data=mapSukabumi, aes(fill=`Jumlah Penduduk`, geometry = geometry)) +
   theme_minimal()
 Jumlah_Penduduk
 ```
 
 Selain kolom `Jumlah Penduduk`, dapat digunakan kolom `Kepadatan Penduduk` untuk menggambarkan permasalahan kependudukan di Kabupaten Sukabumi.
 
-### ii. Kepadatan Penduduk Kabupaten Bogor
+### ii. Kepadatan Penduduk Kabupaten Sukabumi
 
 ```{r dpi=300, fig2, fig.height = 9, fig.width = 16, fig.align = "center"}
 Kepadatan_Penduduk <- ggplot() +  
-  geom_sf(data=mapBogor, aes(fill=`Kepadatan Penduduk`)) +
+  geom_sf(data=mapSukabumi, aes(fill=`Kepadatan Penduduk`, geometry = geometry)) +
   theme_minimal()
 Kepadatan_Penduduk
 ```
 
 Sebagai tambahan, disajikan juga data `Jumlah Desa dan Kelurahan` yang ada di Kabupaten Sukabumi.
 
-### iii. Jumlah Desa & Kelurahan Kabupaten Bogor
+### iii. Jumlah Desa & Kelurahan Kabupaten Sukabumi
 
 ```{r dpi=300, fig3, fig.height = 9, fig.width = 16, fig.align = "center"}
 DesaKelurahan <- ggplot() +  
-  geom_sf(data=mapBogor, aes(fill=`Jumlah Desa dan Kelurahan`)) +
+  geom_sf(data=mapSukabumi, aes(fill=`Jumlah Desa`, geometry = geometry)) +
   theme_minimal()
 DesaKelurahan
+```
+
+## 2. Visualisasi Modifikasi
+
+`ggplot2` dilengkapi dengan banyak opsi untuk mengatur tampilan dari output. Misalnya `scale_fill_gradientn()` untuk mengatur gradasi warna (secara otomatis ataupun costum), `labs()` untuk menambahkan judul grafik maupun keterangan sumbu, `theme()` untuk mengatur tema (legenda, jenis dan ukuran huruf, dan lain-lain), `scale_**_continuous()` pengaturan sumbu tegak maupun sumbu mendatar. Selain itu, juga terdapat color Palette yang dapat digunakan menggunakan library `RColorBrewer` dengan function `brewer.pal(n,name)`. `n` adalah jumlah warna yang digunakan. Terdapat banyak `name` yang digunakan, beberapa contohnya antara lain `BrBG`, `PRGn`, `PiYG`, `PuOr`, `RdBu`, `RdGy`, `RdYlBu`, `RdYlGn`, `Spectral`.
+
+### i. Jumlah Penduduk Kabupaten Sukabumi
+
+```{r dpi=300, fig4, fig.height = 9, fig.width = 16, fig.align = "center"}
+install_load('RColorBrewer')
+colorPalette1 <- brewer.pal(5, "RdYlBu")
+
+Jumlah_Penduduk + scale_fill_gradientn(colors = colorPalette1,
+                       name = "Jumlah Penduduk") +
+  labs(title = "Jumlah Penduduk Kabupaten Sukabumi")  +
+  theme(legend.text = element_text(size=7),
+        legend.title = element_text(size=7),
+        axis.text.x = element_text(size = 7),
+        axis.text.y = element_text(size = 7),
+        title = element_text(size=12, face='bold'))
+```
+
+### ii. Kepadatan Penduduk Kabupaten Sukabumi
+
+```{r dpi=300, fig5, fig.height = 9, fig.width = 16, fig.align = "center"}
+Kepadatan_Penduduk + scale_fill_gradientn(colors = colorPalette1,
+                       name = "Kepadatan Penduduk") +
+  labs(title = "Kepadatan Penduduk Kabupaten Sukabumi")  +
+  theme(legend.text = element_text(size=7),
+        legend.title = element_text(size=7),
+        axis.text.x = element_text(size = 7),
+        axis.text.y = element_text(size = 7),
+        title = element_text(size=12, face='bold'))
+```
+
+### iii. Jumlah Desa & Kelurahan Kabupaten Sukabumi
+
+```{r dpi=300, fig6, fig.height = 9, fig.width = 16, fig.align = "center"}
+DesaKelurahan + scale_fill_gradientn(colors = colorPalette1,
+                       name = "Kepadatan Penduduk") +
+  labs(title = "Jumlah Desa/Kelurahan di Kabupaten Sukabumi")  +
+  theme(legend.text = element_text(size=7),
+        legend.title = element_text(size=7),
+        axis.text.x = element_text(size = 7),
+        axis.text.y = element_text(size = 7),
+        title = element_text(size=12, face='bold')) 
+```
+
+## 3. Visualisasi Interaktif
+
+Visualisasi geospasial interaktif dapat digunakan dengan packages `leaflet` . Untuk mendapatkan *latitude* dan *longitude* nya dapat dilihat pada [Google Maps](https://www.google.com/maps/), Cari lokasi anda, lalu klik kanan.
+
+### i. Jumlah Penduduk Kabupaten Sukabumi
+
+```{r}
+install_load('leaflet','htmltools')
+# membuat custom palette warna
+populationPalette1 <- colorNumeric(
+  palette = "RdYlBu",
+  domain = mapSukabumi$`Jumlah Penduduk`
+)
+
+# membuat custom popup
+popupLabel <- paste0(
+    "<b>Kecamatan ", mapSukabumi$Kecamatan,"</b><br/>", 
+    "Jumlah Penduduk (jiwa): ", mapSukabumi$`Jumlah Penduduk`, "<br/>", 
+    "Kepadatan Penduduk (jiwa/km2): ", mapSukabumi$`Kepadatan Penduduk`, "<br/>", 
+    "Jumlah Desa: ", mapSukabumi$`Jumlah Desa`) %>%
+  lapply(HTML)
+```
+
+```{r}
+# membuat peta leaflet
+leaflet(mapSukabumi) %>% 
+  addProviderTiles(providers$CartoDB.PositronNoLabels, group = "Light Mode") %>%
+  addProviderTiles(providers$CartoDB.DarkMatterNoLabels, group = "Dark Mode") %>%
+  
+  addPolygons(weight = 1,
+              opacity = 1, 
+              fillOpacity = 0.9,
+              label = popupLabel,
+              color = ~populationPalette1(`Jumlah Penduduk`),
+              highlightOptions = highlightOptions(color = "white", 
+                                                  weight = 2, 
+                                                  bringToFront = TRUE) ) %>%
+  addLegend(position = "bottomright", 
+            pal = populationPalette1, 
+            values = ~`Jumlah Penduduk`,
+            title = "Jumlah\nPenduduk",
+            opacity = 1) %>%
+  
+  addLayersControl(position = 'topright',
+                   baseGroups = c("Light Mode", "Dark Mode"),
+                   options = layersControlOptions(collapsed = FALSE)) %>%
+  
+  setView(lat = -7, lng = 106.6, zoom = 9)
+```
+
+### ii. Kepadatan Penduduk Kabupaten Sukabumi
+
+```{r}
+# membuat custom palette warna
+populationPalette2 <- colorNumeric(
+  palette = "RdYlBu",
+  domain = mapSukabumi$`Kepadatan Penduduk`
+)
+```
+
+```{r}
+# membuat peta leaflet
+leaflet(mapSukabumi) %>% 
+  addProviderTiles(providers$CartoDB.PositronNoLabels, group = "Light Mode") %>%
+  addProviderTiles(providers$CartoDB.DarkMatterNoLabels, group = "Dark Mode") %>%
+  
+  addPolygons(weight = 1,
+              opacity = 1, 
+              fillOpacity = 0.9,
+              label = popupLabel,
+              color = ~populationPalette2(`Kepadatan Penduduk`),
+              highlightOptions = highlightOptions(color = "white", 
+                                                  weight = 2, 
+                                                  bringToFront = TRUE) ) %>%
+  addLegend(position = "bottomright", 
+            pal = populationPalette2, 
+            values = ~`Kepadatan Penduduk`,
+            title = "Kepadatan\nPenduduk",
+            opacity = 1) %>%
+  
+  addLayersControl(position = 'topright',
+                   baseGroups = c("Light Mode", "Dark Mode"),
+                   options = layersControlOptions(collapsed = FALSE)) %>%
+  
+  setView(lat = -7, lng = 106.6, zoom = 9)
+```
+
+### iii. Jumlah Desa & Kelurahan Kabupaten Sukabumi
+
+```{r}
+# membuat custom palette warna
+populationPalette3 <- colorNumeric(
+  palette = "RdYlBu",
+  domain = mapSukabumi$`Jumlah Desa`
+)
+```
+
+```{r}
+# membuat peta leaflet
+leaflet(mapSukabumi) %>% 
+  addProviderTiles(providers$CartoDB.PositronNoLabels, group = "Light Mode") %>%
+  addProviderTiles(providers$CartoDB.DarkMatterNoLabels, group = "Dark Mode") %>%
+  
+  addPolygons(weight = 1,
+              opacity = 1, 
+              fillOpacity = 0.9,
+              label = popupLabel,
+              color = ~populationPalette3(`Jumlah Desa`),
+              highlightOptions = highlightOptions(color = "white", 
+                                                  weight = 2, 
+                                                  bringToFront = TRUE) ) %>%
+  addLegend(position = "bottomright", 
+            pal = populationPalette3, 
+            values = ~`Jumlah Desa`,
+            title = "Jumlah\nDesa",
+            opacity = 1) %>%
+  
+  addLayersControl(position = 'topright',
+                   baseGroups = c("Light Mode", "Dark Mode"),
+                   options = layersControlOptions(collapsed = FALSE)) %>%
+  
+ setView(lat = -7, lng = 106.6, zoom = 9)
 ```
