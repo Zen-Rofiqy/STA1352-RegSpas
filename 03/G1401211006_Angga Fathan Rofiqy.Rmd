@@ -1,12 +1,13 @@
 ---
-title: "Praktikum 03 - Regresi dengan Peubah Lag"
-author:
-- Angga Fathan Rofiqy (G1401211006)
+title: "Praktikum 03 Regresi Spasial"
+date: "`r Sys.Date()`"
 output:
-  html_document:
-    theme: yeti
-    toc: true
-    toc_float: true
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: tango
 ---
 
 # I. Setting
@@ -59,6 +60,8 @@ Data yang digunakan adalah Data Demografi Kabupaten Sukabumi tahun 2019 yang mel
 
 -   **Github :** [Github Tugas Praktikum Pekan 3 Regresi Spasial Angga Fathan Rofiqy](https://github.com/Zen-Rofiqy/STA1352-RegSpas/tree/main/03)
 
+-   **Rpubs :** <https://rpubs.com/ZenR_Prog/RegSpas-Prak03>
+
 -   `Jumlah Penduduk` : [Jumlah Penduduk Kabupaten Sukabumi Per Kecamatan (2019)](https://sukabumikab.bps.go.id/statictable/2020/06/16/354/data-penduduk-berdasarkan-jenis-kelamin-menurut-kecamatan-di-kabupaten-sukabumi-semester-ii-tahun-2019-.html)
 
 -   `Kepadatan Penduduk` : [Kepadatan Penduduk Kabupaten Sukabumi Per Kecamatan (2019)](https://sukabumikab.bps.go.id/indicator/12/77/1/kepadatan-penduduk-kabupaten-sukabumi-.html)
@@ -68,6 +71,8 @@ Data yang digunakan adalah Data Demografi Kabupaten Sukabumi tahun 2019 yang mel
 -   `Kode BPS & Kode Kemendagri` : [Kode BPS & Kode Kemendagri Kabupaten Sukabumi](https://sig.bps.go.id/bridging-kode/index)
 
 -   `Luas Wilayah` : [Luas Wilayah Kabupaten Sukabumi Per Kecamatan (2019)](https://sukabumikab.bps.go.id/statictable/2020/06/16/355/luas-daerah-dan-jumlah-pulau-menurut-kecamatan-2019-.html)
+
+-   Theme : [Rmd Themes](https://cran.r-project.org/web/packages/rmdformats/readme/README.html)
 
 ### Import Data Demografi Kabupaten Sukabumi
 
