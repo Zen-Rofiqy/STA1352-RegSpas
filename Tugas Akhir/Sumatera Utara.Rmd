@@ -1,0 +1,304 @@
+---
+title: "Sumatera Utara Analysis"
+author: "KELOMPOK 1"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(raster)
+library(spdep)
+library(sp)
+library(readxl)
+library(openxlsx)
+library(rgdal)
+library(corrplot)
+library(DescTools)
+library(nortest)
+library(car)
+library(spatialreg)
+library(tidyverse)
+library(caret)
+library(leaps)
+library(olsrr)
+```
+
+# Checking & Exploration
+
+```{r}
+data <- read.csv("dota.csv")
+head(data)
+```
+
+```{r message=FALSE, warning=FALSE}
+peta <- readOGR(dsn ="Sumut", layer = "Sumatera_Utara_ADMIN_BPS")
+peta = peta[-which(peta@data$Kabupaten == "Danau Toba"), ]
+```
+
+```{r}
+data[!complete.cases(data),]
+```
+
+## Statistics of All Predictor Candidates
+
+```{r}
+summary(data[,-c(1:5)])
+```
+
+## Boxplot of Variables
+
+```{r}
+for (i in 5:ncol(data) ) {
+  boxplot(data[,i],horizontal=TRUE, main = paste("Sebaran dari ",colnames(data)[i]))
+}
+```
+
+## Pairs
+
+```{r}
+library(DescTools)
+pairs(data[,5:ncol(data)], pch = 19, lower.panel = NULL)
+```
+
+## Correlation Matrix
+
+```{r}
+library(corrplot)
+corrplot(cor(data[,5:ncol(data)]), method = "number")
+```
+
+## Poverty Heatmap (%)
+
+```{r}
+k=101
+colfunc <- colorRampPalette(c("green", "yellow","red"))
+color <- colfunc(k)
+peta$y <- data$y
+spplot(peta, "y", col.regions=color)
+```
+
+# OLS Finding
+
+## Initial/Prior OLS Model
+
+```{r}
+ols <- lm(y~., data = data[,5:ncol(data) ] )
+summary(ols)
+```
+
+## Best Model (Forward Selection)
+
+```{r}
+optmodfw = ols_step_forward_p(ols)
+summary(optmodfw$model)
+```
+
+## Best Model (Backward Selection)
+
+```{r}
+optmodbw = ols_step_backward_p(ols)
+summary(optmodbw$model)
+```
+
+## Best Model (Stepwise)
+
+```{r}
+optmodsw = ols_step_both_p(ols)
+summary(optmodsw$model)
+```
+
+## Best 7-Predictor (7P) Model Taken From Best Subset
+
+```{r}
+Best_Subset <-
+    regsubsets(y~.,
+               data = data[,5:ncol(data) ],
+               nbest = 1,      # 1 best model for each number of predictors
+               nvmax = 7,    # NULL for no limit on number of variables
+               force.in = NULL, force.out = NULL,
+               method = "exhaustive")
+summary_best_subset <- summary(Best_Subset)
+
+summary_best_subset$which[7,2:ncol(summary_best_subset$which)]
+```
+
+## Correlation Matrix of Best 7P Model
+
+```{r}
+chosencol = append( as.vector(TRUE), as.vector(summary_best_subset$which[7,2:ncol(summary_best_subset$which)]) )
+sevendata = data[ ,5:ncol(data)][,chosencol]
+corrplot(cor(sevendata),method = "number",type = 'upper')
+```
+
+## Summary of Best 7P Model
+
+```{r}
+sevenols = lm(y~., data = sevendata )
+summary(sevenols)
+```
+
+## VIF Chosen OLS
+
+```{r}
+vif(sevenols)
+```
+
+## AIC Chosen OLS
+
+```{r}
+AIC(sevenols)
+```
+
+## Normal Error Test
+
+```{r}
+err.sevenols <- residuals(sevenols)
+ad.test(err.sevenols)
+```
+
+# Contiguity Weights
+
+## Queen Contiguity
+
+```{r}
+sp.peta <- SpatialPolygons(peta@polygons)
+qc <- poly2nb(sp.peta, queen = T)
+qc
+```
+
+```{r}
+W.qc <- nb2listw(qc, style='W',zero.policy=TRUE)
+qct = lm.morantest(sevenols, W.qc, alternative="greater", zero.policy = TRUE)
+qct
+```
+
+## Rook Contiguity
+
+```{r}
+sp.peta <- SpatialPolygons(peta@polygons)
+rc <- poly2nb(sp.peta, queen = F)
+rc
+```
+
+```{r}
+W.rc <- nb2listw(rc, style='W',zero.policy=TRUE)
+rct = lm.morantest(sevenols, W.rc, alternative="greater", zero.policy = TRUE)
+rct
+```
+
+# Distance Weights
+
+```{r}
+longlat = coordinates(peta)
+peta$long <- longlat[,1]
+peta$lat <- longlat[,2]
+coords <- peta[c("long","lat")]
+koord <- as.data.frame(coords)
+djarak<-dist(longlat)
+m.djarak<-as.matrix(djarak)
+```
+
+## KNN
+
+```{r}
+W.knn<-knn2nb(knearneigh(longlat,k=5,longlat=TRUE))
+W.knn.s <- nb2listw(W.knn,style='W')
+mt1 = lm.morantest(sevenols,W.knn.s,alternative = "greater")
+mt1
+```
+
+## Radial Distance Weight
+
+```{r}
+W.dmax<-dnearneigh(longlat,0,60,longlat=TRUE)
+W.dmax.s <- nb2listw(W.dmax,style='W', zero.policy = TRUE)
+mt2 = lm.morantest(sevenols,W.dmax.s,alternative = "greater", zero.policy = TRUE)
+mt2
+```
+
+## Exponential Distance Weight
+
+```{r}
+alpha=1
+W.e<-exp((-alpha)*m.djarak)
+diag(W.e)<-0
+rtot<-rowSums(W.e,na.rm=TRUE)
+W.e.sd<-W.e/rtot #row-normalized
+W.e.s = mat2listw(W.e.sd,style='W')
+mt5 = lm.morantest(sevenols,W.e.s,alternative ="greater")
+mt5
+```
+
+## Exponential Distance Weight ($\alpha = 2$)
+
+```{r}
+alpha2=2
+W.e2<-exp((-alpha2)*m.djarak)
+diag(W.e2)<-0
+rtot2<-rowSums(W.e2,na.rm=TRUE)
+W.e2.sd<-W.e2/rtot2 #row-normalized
+W.e2.s = mat2listw(W.e2.sd,style='W')
+mt6 = lm.morantest(sevenols,W.e2.s,alternative = "greater")
+mt6
+```
+
+## All Spatial Weights in Comparison
+
+```{r}
+KodeMatrikBobot <- c("W.knn.s","W.dmax.s","W.e.s","W.e2.s","W.rc","W.qc")
+MatrikBobot <- c("KNN","dmax","Exp1","Exp2","Rook","Queen")
+IndeksMoran <- c(mt1$estimate[1],mt2$estimate[1],mt5$estimate[1],mt6$estimate[1],rct$estimate[1],qct$estimate[1])
+pv = c(mt1$p.value,mt2$p.value,mt5$p.value,mt6$p.value,rct$p.value,qct$p.value)
+M = cbind.data.frame(KodeMatrikBobot,MatrikBobot,IndeksMoran,"p-value"=pv)
+M
+```
+
+## Choosing The Best Weight (Automatic)
+
+```{r}
+MSelect = M[which(M$`p-value` <= 0.05),]
+MSelect2 = MSelect$KodeMatrikBobot[which( MSelect$IndeksMoran == max(MSelect$IndeksMoran) )]
+ww = eval(str2lang(MSelect2))
+```
+
+## Chosen Weight Model (Exponential Distance with $\alpha = 2$)
+
+```{r}
+lm.morantest(sevenols, listw=ww, alternative="two.sided", zero.policy = TRUE)
+```
+
+```{r}
+lmtest::bptest(sevenols)
+```
+
+# Spatial Dependence Model
+
+```{r}
+model <- lm.LMtests(sevenols,listw=ww,zero.policy = TRUE, test=c("LMerr","RLMerr","LMlag","RLMlag","SARMA"))
+summary(model)
+```
+
+## SAR (FIX)
+
+```{r}
+sar <- lagsarlm(y ~., data = sevendata, listw = ww)
+summary(sar, Nagelkerke = T)
+```
+
+## SEM
+
+```{r}
+#sem<-errorsarlm(y ~., data = sevendata, listw = ww)
+#summary(sem)
+```
+
+## SARMA
+
+```{r}
+#SARMA <- sacsarlm(y ~., data = sevendata, listw = ww, zero.policy = TRUE)
+#summary(SARMA)
+```
