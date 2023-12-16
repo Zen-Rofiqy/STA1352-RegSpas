@@ -418,12 +418,26 @@ dev.off() # Menutup file PNG
 
 ## Choropleth Map
 
-```{r}
-k=101
-colfunc <- colorRampPalette(c("green", "yellow","red"))
-color <- colfunc(k)
+```{r dpi=300, fig.height = 20, fig.width = 20, fig.align = "center", message = FALSE, warning=FALSE}
+install_load('RColorBrewer')
+
 peta$y <- data$y
-spplot(peta, "y", col.regions=color)
+my.palette <- brewer.pal(n = 9, name = "OrRd")
+spplot(peta, "y", col.regions=my.palette, cuts = 7, col = "black", 
+       main=list(label="Sebaran Persentase Kemiskinan di Sumatera Utara Tahun 2022\n", 
+                 cex=2) ) 
+```
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/04_map.png", sep=""),
+    height = 10*300, width = 20*300, res=300)
+
+# Plot 
+pairs(m, pch = 19, lower.panel = NULL, col = "#37B883")
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
 ```
 
 # OLS Finding
