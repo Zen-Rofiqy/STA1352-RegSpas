@@ -97,6 +97,7 @@ Tidak ada masalah dalam tipe data.
 ```{r}
 sum(is.na(raw.data))
 raw.data[!complete.cases(raw.data),]
+data <- raw.data
 ```
 
 Tidak ada data kosong.
@@ -104,7 +105,7 @@ Tidak ada data kosong.
 # Eksplorasi
 
 ```{r message=FALSE, warning=FALSE}
-install_load('ggplot2')
+install_load('ggplot2',"cowplot","ggtext")
 theme1.1 <- list(
   theme(axis.text.x = element_text(angle = 45, hjust = 1, 
                                    margin = margin(b = 10, t=20)),
@@ -123,8 +124,227 @@ theme1.1 <- list(
 
 ## Sebaran data peubah y dan x
 
-```{r}
+```{r dpi=300, fig.height = 20, fig.width = 40, fig.align = "center", message = FALSE, warning=FALSE}
+y <-
+ggplot(data, aes(x="", 
+                     y=y)) +
+  #Violin
+  geom_violin(scale="count", fill='#991B1E', color='black', alpha=0.9, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBCE32', color='black',
+                     outlier.size=4, outlier.color='#FBCE32', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "black") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "Y") + theme1.1 
 
+x1 <-
+ggplot(data, aes(x="", 
+                     y=x1)) +
+  #Violin
+  geom_violin(scale="count", fill='#991B1E', color='black', alpha=0.9, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBCE32', color='black',
+                     outlier.size=4, outlier.color='#FBCE32', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "black") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X1") + theme1.1 
+
+x2 <-
+ggplot(data, aes(x="", 
+                     y=x2)) +
+  #Violin
+  geom_violin(scale="count", fill='#991B1E', color='black', alpha=0.9, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBCE32', color='black',
+                     outlier.size=4, outlier.color='#FBCE32', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "black") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X2") + theme1.1 
+
+x3 <-
+ggplot(data, aes(x="", 
+                     y=x3)) +
+  #Violin
+  geom_violin(scale="count", fill='#991B1E', color='black', alpha=0.9, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBCE32', color='black',
+                     outlier.size=4, outlier.color='#FBCE32', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "black") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X3") + theme1.1 
+
+x4 <-
+ggplot(data, aes(x="", 
+                     y=x4)) +
+  #Violin
+  geom_violin(scale="count", fill='#991B1E', color='black', alpha=0.9, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBCE32', color='black',
+                     outlier.size=4, outlier.color='#FBCE32', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "black") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X4") + theme1.1 
+
+x5 <-
+ggplot(data, aes(x="", 
+                     y=x5)) +
+  #Violin
+  geom_violin(scale="count", fill='#991B1E', color='black', alpha=0.9, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBCE32', color='black',
+                     outlier.size=4, outlier.color='#FBCE32', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "black") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X5") + theme1.1 
+
+x6 <-
+ggplot(data, aes(x="", 
+                     y=x6)) +
+  #Violin
+  geom_violin(scale="count", fill='#991B1E', color='black', alpha=0.9, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBCE32', color='black',
+                     outlier.size=4, outlier.color='#FBCE32', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "black") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X6") + theme1.1 
+
+x7 <-
+ggplot(data, aes(x="", 
+                     y=x7)) +
+  #Violin
+  geom_violin(scale="count", fill='#991B1E', color='black', alpha=0.9, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBCE32', color='black',
+                     outlier.size=4, outlier.color='#FBCE32', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "black") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X7") + theme1.1 
+
+x8 <-
+ggplot(data, aes(x="", 
+                     y=x8)) +
+  #Violin
+  geom_violin(scale="count", fill='#991B1E', color='black', alpha=0.9, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBCE32', color='black',
+                     outlier.size=4, outlier.color='#FBCE32', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "black") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X8") + theme1.1 
+
+x9 <-
+ggplot(data, aes(x="", 
+                     y=x9)) +
+  #Violin
+  geom_violin(scale="count", fill='#991B1E', color='black', alpha=0.9, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBCE32', color='black',
+                     outlier.size=4, outlier.color='#FBCE32', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "black") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X9") + theme1.1 
+
+x10 <-
+ggplot(data, aes(x="", 
+                     y=x10)) +
+  #Violin
+  geom_violin(scale="count", fill='#991B1E', color='black', alpha=0.9, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBCE32', color='black',
+                     outlier.size=4, outlier.color='#FBCE32', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "black") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X10") + theme1.1 
+
+x11 <-
+ggplot(data, aes(x="", 
+                     y=x11)) +
+  #Violin
+  geom_violin(scale="count", fill='#991B1E', color='black', alpha=0.9, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBCE32', color='black',
+                     outlier.size=4, outlier.color='#FBCE32', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "black") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X11") + theme1.1 
+
+chart <-
+  plot_grid(y, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11,
+            nrow=2)
+chart
 ```
 
 ## Boxplot of Variables
