@@ -129,15 +129,15 @@ y <-
 ggplot(data, aes(x="", 
                      y=y)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
+  geom_violin(scale="count", fill='#EE6C3A', color=NA, alpha=0.15, 
                     trim = FALSE) +
   #Boxplot
-  geom_boxplot(fill='#FBCE32', color='black',
-                     outlier.size=4, outlier.color='#FBCE32', 
+  geom_boxplot(fill='#EE6C3A', color='black',
+                     outlier.size=4, outlier.color='#EE6C3A', 
                      notch=T, width=0.2) +
   #Mean Marker
   stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
-               color = "black") +
+               color = "white") +
   theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
   labs(x = "\n", 
        y='',
@@ -147,15 +147,15 @@ x1 <-
 ggplot(data, aes(x="", 
                      y=x1)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
+  geom_violin(scale="count", fill='#A12B5E', color=NA, alpha=0.15, 
                     trim = FALSE) +
   #Boxplot
-  geom_boxplot(fill='#FBCE32', color='black',
-                     outlier.size=4, outlier.color='#FBCE32', 
+  geom_boxplot(fill='#A12B5E', color='black',
+                     outlier.size=4, outlier.color='#A12B5E', 
                      notch=T, width=0.2) +
   #Mean Marker
   stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
-               color = "black") +
+               color = "white") +
   theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
   labs(x = "\n", 
        y='',
@@ -165,15 +165,15 @@ x2 <-
 ggplot(data, aes(x="", 
                      y=x2)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
+  geom_violin(scale="count", fill='#EB1948', color=NA, alpha=0.15, 
                     trim = FALSE) +
   #Boxplot
-  geom_boxplot(fill='#FBCE32', color='black',
-                     outlier.size=4, outlier.color='#FBCE32', 
+  geom_boxplot(fill='#EB1948', color='black',
+                     outlier.size=4, outlier.color='#EB1948', 
                      notch=T, width=0.2) +
   #Mean Marker
   stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
-               color = "black") +
+               color = "white") +
   theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
   labs(x = "\n", 
        y='',
@@ -183,15 +183,15 @@ x3 <-
 ggplot(data, aes(x="", 
                      y=x3)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
+  geom_violin(scale="count", fill='#6F2062', color=NA, alpha=0.15, 
                     trim = FALSE) +
   #Boxplot
-  geom_boxplot(fill='#FBCE32', color='black',
-                     outlier.size=4, outlier.color='#FBCE32', 
+  geom_boxplot(fill='#6F2062', color='black',
+                     outlier.size=4, outlier.color='#6F2062', 
                      notch=T, width=0.2) +
   #Mean Marker
   stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
-               color = "black") +
+               color = "white") +
   theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
   labs(x = "\n", 
        y='',
@@ -201,15 +201,15 @@ x4 <-
 ggplot(data, aes(x="", 
                      y=x4)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
+  geom_violin(scale="count", fill='#263574', color=NA, alpha=0.15, 
                     trim = FALSE) +
   #Boxplot
-  geom_boxplot(fill='#FBCE32', color='black',
-                     outlier.size=4, outlier.color='#FBCE32', 
+  geom_boxplot(fill='#263574', color='black',
+                     outlier.size=4, outlier.color='#263574', 
                      notch=T, width=0.2) +
   #Mean Marker
   stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
-               color = "black") +
+               color = "white") +
   theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
   labs(x = "\n", 
        y='',
@@ -219,15 +219,15 @@ x5 <-
 ggplot(data, aes(x="", 
                      y=x5)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
+  geom_violin(scale="count", fill='#1A1334', color=NA, alpha=0.15, 
                     trim = FALSE) +
   #Boxplot
-  geom_boxplot(fill='#FBCE32', color='black',
-                     outlier.size=4, outlier.color='#FBCE32', 
+  geom_boxplot(fill='#1A1334', color='black',
+                     outlier.size=4, outlier.color='#1A1334', 
                      notch=T, width=0.2) +
   #Mean Marker
   stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
-               color = "black") +
+               color = "white") +
   theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
   labs(x = "\n", 
        y='',
@@ -237,15 +237,15 @@ x6 <-
 ggplot(data, aes(x="", 
                      y=x6)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
+  geom_violin(scale="count", fill='#FBBF54', color=NA, alpha=0.15, 
                     trim = FALSE) +
   #Boxplot
-  geom_boxplot(fill='#FBCE32', color='black',
-                     outlier.size=4, outlier.color='#FBCE32', 
+  geom_boxplot(fill='#FBBF54', color='black',
+                     outlier.size=4, outlier.color='#FBBF54', 
                      notch=T, width=0.2) +
   #Mean Marker
   stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
-               color = "black") +
+               color = "white") +
   theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
   labs(x = "\n", 
        y='',
@@ -255,15 +255,15 @@ x7 <-
 ggplot(data, aes(x="", 
                      y=x7)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
+  geom_violin(scale="count", fill='#055559', color=NA, alpha=0.15, 
                     trim = FALSE) +
   #Boxplot
-  geom_boxplot(fill='#FBCE32', color='black',
-                     outlier.size=4, outlier.color='#FBCE32', 
+  geom_boxplot(fill='#055559', color='black',
+                     outlier.size=4, outlier.color='#055559', 
                      notch=T, width=0.2) +
   #Mean Marker
   stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
-               color = "black") +
+               color = "white") +
   theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
   labs(x = "\n", 
        y='',
@@ -273,15 +273,15 @@ x8 <-
 ggplot(data, aes(x="", 
                      y=x8)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
+  geom_violin(scale="count", fill='#ABD36D', color=NA, alpha=0.15, 
                     trim = FALSE) +
   #Boxplot
-  geom_boxplot(fill='#FBCE32', color='black',
-                     outlier.size=4, outlier.color='#FBCE32', 
+  geom_boxplot(fill='#ABD36D', color='black',
+                     outlier.size=4, outlier.color='#ABD36D', 
                      notch=T, width=0.2) +
   #Mean Marker
   stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
-               color = "black") +
+               color = "white") +
   theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
   labs(x = "\n", 
        y='',
@@ -291,15 +291,15 @@ x9 <-
 ggplot(data, aes(x="", 
                      y=x9)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
+  geom_violin(scale="count", fill='#37B883', color=NA, alpha=0.15, 
                     trim = FALSE) +
   #Boxplot
-  geom_boxplot(fill='#FBCE32', color='black',
-                     outlier.size=4, outlier.color='#FBCE32', 
+  geom_boxplot(fill='#37B883', color='black',
+                     outlier.size=4, outlier.color='#37B883', 
                      notch=T, width=0.2) +
   #Mean Marker
   stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
-               color = "black") +
+               color = "white") +
   theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
   labs(x = "\n", 
        y='',
@@ -309,15 +309,15 @@ x10 <-
 ggplot(data, aes(x="", 
                      y=x10)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
+  geom_violin(scale="count", fill='#26294A', color=NA, alpha=0.15, 
                     trim = FALSE) +
   #Boxplot
-  geom_boxplot(fill='#FBCE32', color='black',
-                     outlier.size=4, outlier.color='#FBCE32', 
+  geom_boxplot(fill='#26294A', color='black',
+                     outlier.size=4, outlier.color='#26294A', 
                      notch=T, width=0.2) +
   #Mean Marker
   stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
-               color = "black") +
+               color = "white") +
   theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
   labs(x = "\n", 
        y='',
@@ -327,15 +327,15 @@ x11 <-
 ggplot(data, aes(x="", 
                      y=x11)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
+  geom_violin(scale="count", fill='#047453', color=NA, alpha=0.15, 
                     trim = FALSE) +
   #Boxplot
-  geom_boxplot(fill='#FBCE32', color='black',
-                     outlier.size=4, outlier.color='#FBCE32', 
+  geom_boxplot(fill='#047453', color='black',
+                     outlier.size=4, outlier.color='#047453', 
                      notch=T, width=0.2) +
   #Mean Marker
   stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
-               color = "black") +
+               color = "white") +
   theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
   labs(x = "\n", 
        y='',
