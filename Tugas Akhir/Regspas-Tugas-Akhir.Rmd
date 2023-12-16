@@ -363,16 +363,29 @@ ggsave("01_Sebaran Data.png", chart, path = export.chart,
 
 ## Hubungan antar peubah
 
-```{r dpi=300, fig.height = 10, fig.width = 20, fig.align = "center", message = FALSE, warning=FALSE}
-install_load('DescTools')
-pairs(data[,5:ncol(data)], pch = 19, lower.panel = NULL, col = "#37B883")
+> Correlation Plot
+
+```{r dpi=300, fig.height = 15, fig.width = 15, fig.align = "center", message = FALSE, warning=FALSE}
+install_load('scales')
+m <- cor(data[,5:ncol(data)]) #Membuat matriks korelasi
+
+colors <- alpha(colorRampPalette(c("#bba58b", #Warna Bawah
+                                   "#e4e4e4", #Warna Tengah
+                                   "#75bfc8"))(10), #Warna Atas
+                                   alpha = 0.95) #Transparan
+
+#Corrplot Elips
+corrplot(m, method = 'ellipse', type='lower', order='original', col=colors)
+#Corrplot Angka
+corrplot(m, add=TRUE, method = 'number', type='upper', order='original',
+         tl.pos = "lt", tl.col = "#78b1b0", col=colors)
 ```
 
-## Correlation Matrix
+> Scatterplot
 
-```{r}
-library(corrplot)
-corrplot(cor(data[,5:ncol(data)]), method = "number")
+```{r dpi=300, fig.height = 10, fig.width = 20, fig.align = "center", message = FALSE, warning=FALSE}
+install_load('DescTools')
+pairs(m, pch = 19, lower.panel = NULL, col = "#37B883")
 ```
 
 ## Poverty Heatmap (%)
