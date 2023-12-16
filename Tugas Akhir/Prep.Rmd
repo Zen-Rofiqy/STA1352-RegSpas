@@ -57,20 +57,11 @@ opts_knit$set(root.dir = "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt
 ```
 
 ```{r message=FALSE, warning=FALSE}
-install_load("raster","spdep","sp","readxl","openxlsx","rgdal","corrplot","DescTools","nortest","car","spatialreg","tidyverse","caret","leaps","olsrr","rio","DT","dplyr")
+install_load("raster","spdep","sp","readxl","openxlsx","rgdal","corrplot","DescTools","nortest","car","spatialreg","tidyverse","caret","leaps","olsrr","rio","DT","dplyr","openxlsx")
 ```
 
 ```{r}
-data1 <- read_excel()
-data1 <- rbind(
-  read.csv("AMD.csv") %>% mutate(Name = "AMD"),
-  read.csv("ARM.csv") %>% mutate(Name = "ARM"),
-  read.csv("AVGO.csv") %>% mutate(Name = "AVGO"),
-  read.csv("NVDA.csv") %>% mutate(Name = "NVDA"),
-  read.csv("TSM.csv") %>% mutate(Name = "TSM"),
-  read.csv("INTC.csv") %>% mutate(Name = "INTC")  ) %>% 
-    relocate(Name, .before = 1) %>% 
-  rename(`Adj Close` = Adj.Close)
+data1 <- read_excel("Data Regresi Spasial.xlsx")
 
-write.csv(data1, "@AAANTI Stock Prices.csv", row.names=FALSE)
+write.csv(data1, "Data.csv", row.names=FALSE)
 ```
