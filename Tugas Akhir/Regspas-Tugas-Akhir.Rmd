@@ -59,38 +59,6 @@ export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/4. Reg
 
 # Pendahuluan
 
-## Dataset
-
-Data yang digunakan adalah data sekunder yang bersumber dari Badan Pusat Statistik (BPS). Daerah yang menjadi sasaran analisis adalah Provinsi Sumatera Selatan. Data peubah respon dan peubah bebas yang digunakan adalah data tahun 2022 dengan rincian sebagai berikut:
-
--   Y = Indeks Pembangunan Manusia Provinsi Sumatera Selatan pada tahun 2022
-
--   X1 = Presentasi Penduduk Miskin Provinsi Sumatera Selatan pada tahun 2022
-
--   X2 = Tingkat pengangguran Terbuka Provinsi Sumatera Selatan pada tahun 2022
-
--   X3 = Jumlah Tenaga Kesehatan Menurut Kabupaten/Kota (Orang) di Provinsi Sumatera Selatan pada tahun 2022
-
--   X4 = Persentase rumah tangga yang memiliki akses terhadap air minum layak menurut Kabupaten/Kota Sumatera Selatan (Persen) pada tahun 2022
-
--   X5 = Indeks Pemberdayaan Gender Provinsi Sumatera Selatan pada tahun 2022
-
--   X6 = Laju pertumbuhan penduduk (persen)
-
--   X7 = Kepadatan penduduk (per km\^2)
-
--   X8 = Tingkat partisipasi angkatan kerja
-
--   X9 = Persentase rumah tangga yang memiliki akses terhadap sanitasi layak
-
--   X10= Angka rata-rata lama sekolah
-
--   X11= Angka harapan lama sekolah
-
--   X12= Angka pengeluaran perkapita
-
--   X13= Umur harapan hidup
-
 ```{r message=FALSE, warning=FALSE}
 install_load("raster","spdep","sp","readxl","openxlsx","rgdal","corrplot","DescTools","nortest","car","spatialreg","tidyverse","caret","leaps","olsrr","rio","DT")
 ```
