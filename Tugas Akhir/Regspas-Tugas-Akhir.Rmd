@@ -375,10 +375,19 @@ colors <- alpha(colorRampPalette(c("#D89534", #Warna Bawah
                                    alpha = 0.95) #Transparan
 
 #Corrplot Elips
-corrplot(m, method = 'ellipse', type='lower', order='original', col=colors)
-#Corrplot Angka
-corrplot(m, add=TRUE, method = 'number', type='upper', order='original',
-         tl.pos = "lt", tl.col = "#4EC2C1", col=colors)
+corrplot(m, method = 'color',  addCoef.col="black",  diag=FALSE, type='lower', 
+         tl.col = "#4EC2C1", col=colors)
+```
+
+```{r dpi=300, fig.height = 7.5, fig.width = 7.5, fig.align = "center", message = FALSE, warning=FALSE}
+## Corr plot
+install_load('metan')
+colors <- alpha(colorRampPalette(c("#D89534", #Warna Bawah
+                                   "#DEDBCE", #Warna Tengah
+                                   "#4EC2C1"))(10), #Warna Atas
+                                   alpha = 0.95) #Transparan
+
+plot(corr_coef(data[,5:ncol(data)]))
 ```
 
 ```{r, include=FALSE, echo=FALSE}
@@ -431,10 +440,12 @@ spplot(peta, "y", col.regions=my.palette, cuts = 7, col = "black",
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/04_map.png", sep=""),
-    height = 10*300, width = 20*300, res=300)
+    height = 20*300, width = 20*300, res=300)
 
 # Plot 
-pairs(m, pch = 19, lower.panel = NULL, col = "#37B883")
+spplot(peta, "y", col.regions=my.palette, cuts = 7, col = "black", 
+       main=list(label="Sebaran Persentase Kemiskinan di Sumatera Utara Tahun 2022\n", 
+                 cex=2) ) 
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
