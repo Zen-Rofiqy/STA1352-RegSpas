@@ -1,0 +1,76 @@
+---
+title: "Prep"
+author: "Angga Fathan Rofiqy"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: true
+    highlight: tango
+    code_folding: show
+    toc_depth: 3
+    number_sections: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    fig_caption: true
+pkgdown:
+  as_is: true
+---
+
+```{r, warning=FALSE, message = FALSE}
+#                      -=( Install & Load Package Function )=-
+install_load <- function (package1, ...)  {   
+
+   # convert arguments to vector
+   packages <- c(package1, ...)
+
+   # start loop to determine if each package is installed
+   for(package in packages){
+
+       # if package is installed locally, load
+       if(package %in% rownames(installed.packages()))
+          do.call('library', list(package))
+
+       # if package is not installed locally, download, then load
+       else {
+          install.packages(package)
+          do.call("library", list(package))
+       }
+   } 
+}
+
+#Path Function
+path <- function(){
+  gsub  ( "\\\\",  "/",  readClipboard ()  )
+}
+#Copy path, Panggil function di console
+#Copy r path, paste ke var yang diinginkan
+```
+
+```{r setup, include=FALSE, echo=FALSE}
+#SetWD
+require("knitr")
+opts_knit$set(root.dir = "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/4. Regresi Spasial/Tugas Akhir")
+```
+
+```{r message=FALSE, warning=FALSE}
+install_load("raster","spdep","sp","readxl","openxlsx","rgdal","corrplot","DescTools","nortest","car","spatialreg","tidyverse","caret","leaps","olsrr","rio","DT","dplyr")
+```
+
+```{r}
+data1 <- read_excel()
+data1 <- rbind(
+  read.csv("AMD.csv") %>% mutate(Name = "AMD"),
+  read.csv("ARM.csv") %>% mutate(Name = "ARM"),
+  read.csv("AVGO.csv") %>% mutate(Name = "AVGO"),
+  read.csv("NVDA.csv") %>% mutate(Name = "NVDA"),
+  read.csv("TSM.csv") %>% mutate(Name = "TSM"),
+  read.csv("INTC.csv") %>% mutate(Name = "INTC")  ) %>% 
+    relocate(Name, .before = 1) %>% 
+  rename(`Adj Close` = Adj.Close)
+
+write.csv(data1, "@AAANTI Stock Prices.csv", row.names=FALSE)
+```
