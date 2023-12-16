@@ -129,7 +129,7 @@ y <-
 ggplot(data, aes(x="", 
                      y=y)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', alpha=0.25, 
+  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
                     trim = FALSE) +
   #Boxplot
   geom_boxplot(fill='#FBCE32', color='black',
@@ -147,7 +147,7 @@ x1 <-
 ggplot(data, aes(x="", 
                      y=x1)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', alpha=0.25, 
+  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
                     trim = FALSE) +
   #Boxplot
   geom_boxplot(fill='#FBCE32', color='black',
@@ -165,7 +165,7 @@ x2 <-
 ggplot(data, aes(x="", 
                      y=x2)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', alpha=0.25, 
+  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
                     trim = FALSE) +
   #Boxplot
   geom_boxplot(fill='#FBCE32', color='black',
@@ -183,7 +183,7 @@ x3 <-
 ggplot(data, aes(x="", 
                      y=x3)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', alpha=0.25, 
+  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
                     trim = FALSE) +
   #Boxplot
   geom_boxplot(fill='#FBCE32', color='black',
@@ -201,7 +201,7 @@ x4 <-
 ggplot(data, aes(x="", 
                      y=x4)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', alpha=0.25, 
+  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
                     trim = FALSE) +
   #Boxplot
   geom_boxplot(fill='#FBCE32', color='black',
@@ -219,7 +219,7 @@ x5 <-
 ggplot(data, aes(x="", 
                      y=x5)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', alpha=0.25, 
+  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
                     trim = FALSE) +
   #Boxplot
   geom_boxplot(fill='#FBCE32', color='black',
@@ -237,7 +237,7 @@ x6 <-
 ggplot(data, aes(x="", 
                      y=x6)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', alpha=0.25, 
+  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
                     trim = FALSE) +
   #Boxplot
   geom_boxplot(fill='#FBCE32', color='black',
@@ -255,7 +255,7 @@ x7 <-
 ggplot(data, aes(x="", 
                      y=x7)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', alpha=0.25, 
+  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
                     trim = FALSE) +
   #Boxplot
   geom_boxplot(fill='#FBCE32', color='black',
@@ -273,7 +273,7 @@ x8 <-
 ggplot(data, aes(x="", 
                      y=x8)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', alpha=0.25, 
+  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
                     trim = FALSE) +
   #Boxplot
   geom_boxplot(fill='#FBCE32', color='black',
@@ -291,7 +291,7 @@ x9 <-
 ggplot(data, aes(x="", 
                      y=x9)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', alpha=0.25, 
+  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
                     trim = FALSE) +
   #Boxplot
   geom_boxplot(fill='#FBCE32', color='black',
@@ -309,7 +309,7 @@ x10 <-
 ggplot(data, aes(x="", 
                      y=x10)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', alpha=0.25, 
+  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
                     trim = FALSE) +
   #Boxplot
   geom_boxplot(fill='#FBCE32', color='black',
@@ -327,7 +327,7 @@ x11 <-
 ggplot(data, aes(x="", 
                      y=x11)) +
   #Violin
-  geom_violin(scale="count", fill='#991B1E', alpha=0.25, 
+  geom_violin(scale="count", fill='#991B1E', color=NA, alpha=0.25, 
                     trim = FALSE) +
   #Boxplot
   geom_boxplot(fill='#FBCE32', color='black',
