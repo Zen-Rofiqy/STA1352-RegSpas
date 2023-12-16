@@ -388,14 +388,10 @@ plot(corr_coef(data[,5:ncol(data)]), reorder = FALSE)
 ```{r, include=FALSE, echo=FALSE}
 #Export Chart
 png(paste(export.chart, "/02_Corrplot.png", sep=""),
-    height = 10*300, width = 10*300, res=300)
+    height = 7.5*300, width = 7.5*300, res=300)
 
 # Plot 
-#Corrplot Elips
-corrplot(m, method = 'ellipse', type='lower', order='original', col=colors)
-#Corrplot Angka
-corrplot(m, add=TRUE, method = 'number', type='upper', order='original',
-         tl.pos = "lt", tl.col = "#4EC2C1", col=colors)
+plot(corr_coef(data[,5:ncol(data)]), reorder = FALSE)
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
