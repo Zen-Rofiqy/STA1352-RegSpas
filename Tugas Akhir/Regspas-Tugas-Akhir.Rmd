@@ -66,14 +66,14 @@ export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/4. Reg
 # Pendahuluan
 
 ```{r message=FALSE, warning=FALSE}
-install_load("raster","spdep","sp","readxl","openxlsx","rgdal","corrplot","DescTools","nortest","car","spatialreg","tidyverse","caret","leaps","olsrr","rio","DT")
+install_load("raster","spdep","sp","readxl","openxlsx","rgdal","corrplot","DescTools","nortest","car","spatialreg","tidyverse","caret","leaps","olsrr","rio","DT","dplyr")
 ```
 
 ## Data Preparation
 
 ### Import Data
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1352-RegSpas/main/Tugas%20Akhir/Data.csv")
 peta <- readOGR(dsn ="Sumut", layer = "Sumatera_Utara_ADMIN_BPS")
 peta <- peta[-which(peta@data$Kabupaten == "Danau Toba"), ]
@@ -101,26 +101,30 @@ raw.data[!complete.cases(raw.data),]
 
 Tidak ada data kosong.
 
-# Checking & Exploration
-
-```{r}
-data <- read.csv("dota.csv")
-head(data)
-```
+# Eksplorasi
 
 ```{r message=FALSE, warning=FALSE}
-peta <- readOGR(dsn ="Sumut", layer = "Sumatera_Utara_ADMIN_BPS")
-peta = peta[-which(peta@data$Kabupaten == "Danau Toba"), ]
+install_load('ggplot2')
+theme1.1 <- list(
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, 
+                                   margin = margin(b = 10, t=20)),
+        axis.text.y = element_text(vjust = 0.5, face = "bold", 
+                                   margin = margin(l = 50, r = 20)),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        text = element_text(size = 30),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = 'transparent'),
+        plot.background = element_rect(fill='transparent', color=NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(linewidth = 1, colour = "black"))
+        ) 
 ```
 
-```{r}
-data[!complete.cases(data),]
-```
-
-## Statistics of All Predictor Candidates
+## Sebaran data peubah y dan x
 
 ```{r}
-summary(data[,-c(1:5)])
+
 ```
 
 ## Boxplot of Variables
