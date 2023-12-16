@@ -1,0 +1,443 @@
+---
+title: "Tugas Akhir Regspas"
+author: "Angga Fathan Rofiqy"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: true
+    highlight: tango
+    code_folding: hide
+    toc_depth: 3
+    number_sections: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    fig_caption: true
+pkgdown:
+  as_is: true
+---
+
+Kode di `Hide` dalam *default*, untuk menampilkan kode, klik `Code` .
+
+```{r, warning=FALSE, message = FALSE}
+#                      -=( Install & Load Package Function )=-
+install_load <- function (package1, ...)  {   
+
+   # convert arguments to vector
+   packages <- c(package1, ...)
+
+   # start loop to determine if each package is installed
+   for(package in packages){
+
+       # if package is installed locally, load
+       if(package %in% rownames(installed.packages()))
+          do.call('library', list(package))
+
+       # if package is not installed locally, download, then load
+       else {
+          install.packages(package)
+          do.call("library", list(package))
+       }
+   } 
+}
+
+#Path Function
+path <- function(){
+  gsub  ( "\\\\",  "/",  readClipboard ()  )
+}
+#Copy path, Panggil function di console
+#Copy r path, paste ke var yang diinginkan
+```
+
+```{r , include=FALSE, echo=FALSE, warning=FALSE, message = FALSE}
+#Set Working Directory
+require("knitr")
+opts_knit$set(root.dir = "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/4. Regresi Spasial/Tugas Akhir")
+```
+
+```{r}
+#Export chart
+export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/4. Regresi Spasial/Tugas Akhir/Chart"
+```
+
+# Pendahuluan
+
+```{r message=FALSE, warning=FALSE}
+install_load("raster","spdep","sp","readxl","openxlsx","rgdal","corrplot","DescTools","nortest","car","spatialreg","tidyverse","caret","leaps","olsrr","rio","DT","dplyr")
+```
+
+## Data Preparation
+
+### Import Data
+
+```{r message=FALSE, warning=FALSE}
+raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1352-RegSpas/main/Tugas%20Akhir/Data.csv")
+peta <- readOGR(dsn ="Sumut", layer = "Sumatera_Utara_ADMIN_BPS")
+peta <- peta[-which(peta@data$Kabupaten == "Danau Toba"), ]
+
+datatable(raw.data, filter = 'top', 
+          options = list(pageLength = 5))
+```
+
+### Data Checking
+
+> Cek Tipe data
+
+```{r}
+str(raw.data)
+```
+
+Tidak ada masalah dalam tipe data.
+
+> Cek Data kosong
+
+```{r}
+sum(is.na(raw.data))
+raw.data[!complete.cases(raw.data),]
+data <- raw.data
+```
+
+Tidak ada data kosong.
+
+# Eksplorasi
+
+```{r message=FALSE, warning=FALSE}
+install_load('ggplot2',"cowplot","ggtext")
+theme1.1 <- list(
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, 
+                                   margin = margin(b = 10, t=20)),
+        axis.text.y = element_text(vjust = 0.5, face = "bold", 
+                                   margin = margin(l = 50, r = 20)),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        text = element_text(size = 30),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = 'transparent'),
+        plot.background = element_rect(fill='transparent', color=NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(linewidth = 1, colour = "black"))
+        ) 
+theme3.2 <- list(
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        text = element_text(size = 30),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = 'transparent', color=NA),
+        plot.background = element_rect(fill='transparent', color=NA),
+        panel.grid.major = element_line(colour = "grey90"),
+        axis.line = element_line(linewidth = 1.5, colour = "black")
+        ) 
+)
+```
+
+## Sebaran data peubah y dan x
+
+```{r dpi=300, fig.height = 20, fig.width = 40, fig.align = "center", message = FALSE, warning=FALSE}
+y <-
+ggplot(data, aes(x="", 
+                     y=y)) +
+  #Violin
+  geom_violin(scale="count", fill='#EE6C3A', color=NA, alpha=0.15, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#EE6C3A', color='black',
+                     outlier.size=4, outlier.color='#EE6C3A', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "white") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "Y") + theme1.1 
+
+x1 <-
+ggplot(data, aes(x="", 
+                     y=x1)) +
+  #Violin
+  geom_violin(scale="count", fill='#A12B5E', color=NA, alpha=0.15, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#A12B5E', color='black',
+                     outlier.size=4, outlier.color='#A12B5E', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "white") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X1") + theme1.1 
+
+x2 <-
+ggplot(data, aes(x="", 
+                     y=x2)) +
+  #Violin
+  geom_violin(scale="count", fill='#EB1948', color=NA, alpha=0.15, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#EB1948', color='black',
+                     outlier.size=4, outlier.color='#EB1948', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "white") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X2") + theme1.1 
+
+x3 <-
+ggplot(data, aes(x="", 
+                     y=x3)) +
+  #Violin
+  geom_violin(scale="count", fill='#6F2062', color=NA, alpha=0.15, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#6F2062', color='black',
+                     outlier.size=4, outlier.color='#6F2062', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "white") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X3") + theme1.1 
+
+x4 <-
+ggplot(data, aes(x="", 
+                     y=x4)) +
+  #Violin
+  geom_violin(scale="count", fill='#263574', color=NA, alpha=0.15, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#263574', color='black',
+                     outlier.size=4, outlier.color='#263574', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "white") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X4") + theme1.1 
+
+x5 <-
+ggplot(data, aes(x="", 
+                     y=x5)) +
+  #Violin
+  geom_violin(scale="count", fill='#1A1334', color=NA, alpha=0.15, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#1A1334', color='black',
+                     outlier.size=4, outlier.color='#1A1334', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "white") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X5") + theme1.1 
+
+x6 <-
+ggplot(data, aes(x="", 
+                     y=x6)) +
+  #Violin
+  geom_violin(scale="count", fill='#FBBF54', color=NA, alpha=0.15, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#FBBF54', color='black',
+                     outlier.size=4, outlier.color='#FBBF54', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "white") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X6") + theme1.1 
+
+x7 <-
+ggplot(data, aes(x="", 
+                     y=x7)) +
+  #Violin
+  geom_violin(scale="count", fill='#055559', color=NA, alpha=0.15, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#055559', color='black',
+                     outlier.size=4, outlier.color='#055559', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "white") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X7") + theme1.1 
+
+x8 <-
+ggplot(data, aes(x="", 
+                     y=x8)) +
+  #Violin
+  geom_violin(scale="count", fill='#ABD36D', color=NA, alpha=0.15, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#ABD36D', color='black',
+                     outlier.size=4, outlier.color='#ABD36D', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "white") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X8") + theme1.1 
+
+x9 <-
+ggplot(data, aes(x="", 
+                     y=x9)) +
+  #Violin
+  geom_violin(scale="count", fill='#37B883', color=NA, alpha=0.15, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#37B883', color='black',
+                     outlier.size=4, outlier.color='#37B883', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "white") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X9") + theme1.1 
+
+x10 <-
+ggplot(data, aes(x="", 
+                     y=x10)) +
+  #Violin
+  geom_violin(scale="count", fill='#26294A', color=NA, alpha=0.15, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#26294A', color='black',
+                     outlier.size=4, outlier.color='#26294A', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "white") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X10") + theme1.1 
+
+x11 <-
+ggplot(data, aes(x="", 
+                     y=x11)) +
+  #Violin
+  geom_violin(scale="count", fill='#047453', color=NA, alpha=0.15, 
+                    trim = FALSE) +
+  #Boxplot
+  geom_boxplot(fill='#047453', color='black',
+                     outlier.size=4, outlier.color='#047453', 
+                     notch=T, width=0.2) +
+  #Mean Marker
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 4, 
+               color = "white") +
+  theme(plot.title = element_text(hjust=0.5),legend.position = "none") +
+  labs(x = "\n", 
+       y='',
+       title = "X11") + theme1.1 
+
+chart <-
+  plot_grid(y, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11,
+            nrow=2)
+chart
+
+ggsave("01_Sebaran Data.png", chart, path = export.chart,
+        dpi = 300, height = 20, width = 40)
+```
+
+## Hubungan antar peubah
+
+> Correlation Plot
+
+```{r dpi=300, fig.height = 10, fig.width = 10, fig.align = "center", message = FALSE, warning=FALSE}
+install_load('scales')
+m <- cor(data[,5:(ncol(data))]) #Membuat matriks korelasi
+
+colors <- alpha(colorRampPalette(c("#D89534", #Warna Bawah
+                                   "#DEDBCE", #Warna Tengah
+                                   "#4EC2C1"))(10), #Warna Atas
+                                   alpha = 0.95) #Transparan
+
+#Corrplot Elips
+corrplot(m, method = 'color',  addCoef.col="black",  diag=FALSE, type='lower', 
+         tl.col = "black", col=colors, bg="white", pch="+")
+```
+
+```{r dpi=300, fig.height = 7.5, fig.width = 7.5, fig.align = "center", message = FALSE, warning=FALSE}
+## Corr plot
+install_load('metan')
+plot(corr_coef(data[,5:(ncol(data))]), reorder = FALSE)
+```
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/02_Corrplot.png", sep=""),
+    height = 7.5*300, width = 7.5*300, res=300)
+
+# Plot 
+plot(corr_coef(data[,5:(ncol(data))]), reorder = FALSE)
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+> Scatterplot
+
+```{r dpi=300, fig.height = 10, fig.width = 20, fig.align = "center", message = FALSE, warning=FALSE}
+install_load('DescTools')
+pairs(m, pch = 19, lower.panel = NULL, col = "#37B883")
+```
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/03_Scatterplot.png", sep=""),
+    height = 10*300, width = 20*300, res=300)
+
+# Plot 
+pairs(m, pch = 19, lower.panel = NULL, col = "#37B883")
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
+
+## Choropleth Map
+
+```{r dpi=300, fig.height = 20, fig.width = 20, fig.align = "center", message = FALSE, warning=FALSE}
+install_load('RColorBrewer')
+
+peta$y <- data$y
+my.palette <- brewer.pal(n = 9, name = "OrRd")
+spplot(peta, "y", col.regions=my.palette, cuts = 7, col = "black", 
+       main=list(label="Sebaran Persentase Kemiskinan di Sumatera Utara Tahun 2022\n", 
+                 cex=2) ) 
+```
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/04_map.png", sep=""),
+    height = 20*300, width = 20*300, res=300)
+
+# Plot 
+spplot(peta, "y", col.regions=my.palette, cuts = 7, col = "black", 
+       main=list(label="Sebaran Persentase Kemiskinan di Sumatera Utara Tahun 2022\n", 
+                 cex=2) ) 
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
+```
