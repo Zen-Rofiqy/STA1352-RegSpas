@@ -1,0 +1,275 @@
+---
+title: "Project Akhir Regspas"
+author: "Rafli Radithya"
+date: "22/11/2023"
+output: html_document
+---
+
+```{r}
+
+library(raster)
+library(spdep)
+library(sp)
+library(readxl)
+library(openxlsx)
+library(rgdal)
+library(corrplot)
+library(DescTools)
+library(nortest)
+library(car)
+library(spatialreg)
+```
+
+## Input Data
+
+```{r cars}
+library(readxl)
+setwd("C:/Users/USER/OneDrive/Dokumen/REGRESI SPASIAL/Praktikum Regresi Spasial")
+rs <- read_excel("Data Regresi Spasial b.xlsx")
+View(rs)
+rs=rs[,-c(1,2)]
+rs
+```
+
+## Pembuatan Plot Map
+
+```{r}
+#Sp plot
+setwd("C:/Users/USER/OneDrive/Dokumen/REGRESI SPASIAL/Sumut-20231210T153627Z-001/Sumut")
+#su=st_read("Sumatera_Utara_ADMIN_BPS.shp")
+su <- readOGR(dsn ="C:/Users/USER/OneDrive/Dokumen/REGRESI SPASIAL/Sumut-20231210T153627Z-001/Sumut", layer = "Sumatera_Utara_ADMIN_BPS")
+su = su[-which(su$Kabupaten == "Danau Toba"), ]
+
+su$y <- rs$y
+library(RColorBrewer)
+display.brewer.all()
+my.palette <- brewer.pal(n = 9, name = "OrRd")
+spplot(su, "y", col.regions=my.palette, cuts = 7, col = "transparent",main="Sebaran Persentase Kemiskinan di Sumatera Utara Tahun 2022")
+```
+
+Berdasarkan plot, diketahui bahwa persentase kemiskinan antar wilayah setiap Kabupaten/Kota Sumut di Pulau Sumatra cenderung tidak berbeda jauh, yaitu berkisar 5-10% sehingga dapat diduga terdapat dependensi spasial. Hal ini berbeda dengan pulau lainnya
+
+## Eksplorasi Data
+
+```{r}
+## Corr plot
+rsc=rs[,c(1:12)]
+library(metan)
+ALL=corr_coef(rsc)
+plot(ALL)
+
+##Boxplot
+srs=scale(rsc)
+boxplot(srs)
+```
+
+Berdasarkan corr plot, terdapat korelasi yang cukup signifikan antara setiap peubah bebas dengan peubah respon. Namun, terdapat korelasi yang cukup signifikan anatara setiap peubah bebas. Hal ini dapat diduga adanya multikolinearitas. Selain itu, pada visualisasi boxplot, diketahui bahwa setiap boxplot memiliki tinggi yang relatif sama untuk setiap peubah serta terdapat beberapa pencilan data pada peubah respon, x3,x5, dan x10.
+
+## Uji signifikansi parameter ols model penuh
+
+```{r}
+ols <- lm(y~x1+x2+x3+x4+x5+x6+x7+x8+x9+x10+x11, data=rs)
+summary(ols)
+```
+
+## Uji multikol
+
+```{r}
+v=as.data.frame(vif(ols))
+colnames(v)=c("Nilai VIF")
+v
+```
+Terdapat multikol sehingga akan dilakukan penghapusan variabel tersebut
+## Uji signifikansi model sebagian
+
+Membuang peubah dengan VIF \> 10 dan tidak memiliki hubungan linier
+
+```{r}
+ols2 <- lm(y~x1+x2+x3+x4+x7+x9+x11, data=rs)
+summary(ols2)
+vif(ols2)
+```
+
+## Pembuatan Matriks Pembobot Kontiguity
+
+Karena pada provinsi Sumatera Utara ini terdapat Kota/Kabupatennya yang jarak pulaunya terpisah dengan lautan atau danau, kandidat matriks pembobot kontiguity akan dipilih berdasarkan jarak
+
+```{r}
+#Matriks koordinat
+longlat <- coordinates(su)
+su$long <- longlat[,1]
+su$lat <- longlat[,2]
+coords <- su[c("long","lat")]
+#class(coords)
+koord <- as.data.frame(coords)
+djarak<-dist(longlat,method="euclidean")
+m.djarak<-as.matrix(djarak)
+m.djarak
+```
+
+### KNN Method
+
+```{r}
+ols <- lm(y~x1+x2+x3+x4+x5+x6+x7+x8+x9+x10, data=rs)
+W.knn<-knn2nb(knearneigh(longlat,k=3,longlat=TRUE))
+W.knn.s <- nb2listw(W.knn,style='W')
+mt1 = lm.morantest(ols2,W.knn.s,alternative = "greater")
+mt1
+```
+
+### Radial Distance
+
+```{r}
+W.dmax<-dnearneigh(longlat,0,20,longlat=TRUE)
+W.dmax.s <- nb2listw(W.dmax,style='W',zero.policy = TRUE)
+mt2 = lm.morantest(ols2,W.dmax.s,alternative = "greater")
+mt2
+
+
+```
+
+### Exp
+
+```{r}
+alpha=1
+W.e<-exp((-alpha)*m.djarak)
+diag(W.e)<-0
+rtot<-rowSums(W.e,na.rm=TRUE) 
+
+W.e.sd<-W.e/rtot #row-normalized 
+rowSums(W.e.sd,na.rm=TRUE)
+W.ed1 = mat2listw(W.e.sd,style='W') 
+mt3 = lm.morantest(ols2,W.ed1,alternative = "greater")
+mt3
+
+alpha=2
+W.e<-exp((-alpha)*m.djarak)
+diag(W.e)<-0
+rtot<-rowSums(W.e,na.rm=TRUE) 
+
+W.e.sd<-W.e/rtot #row-normalized 
+rowSums(W.e.sd,na.rm=TRUE)
+W.ed1 = mat2listw(W.e.sd,style='W') 
+mt4 = lm.morantest(ols2,W.ed1,alternative = "greater")
+mt4
+```
+
+### Best Weighted Matrix
+
+```{r}
+
+MatrikBobot <- c("KNN","dmax","Exp1","Exp2")
+IndeksMoran <- c(mt1$estimate[1],mt2$estimate[1],mt3$estimate[1],mt4$estimate[1])
+pv = c(mt1$p.value,mt2$p.value,mt3$p.value,mt4$p.value)
+M = cbind.data.frame(MatrikBobot,IndeksMoran,"p-value"=pv)
+M
+```
+
+
+## Pengujian asumsi sisaan
+
+```{r}
+library(lmtest)
+#Sisaan menyebar normal
+Normalitas=shapiro.test(ols2$residuals)
+
+#Sisaan homogen
+Homogenitas=lmtest::bptest(ols2)
+
+#Autokorelasi spasial
+Autokorelasi.Spasial=lm.morantest(ols2, listw=W.knn.s, alternative="two.sided", zero.policy = TRUE)
+
+#Sisaan berada di nilai tengah 0
+Nilai.Tengah=t.test(ols2$residuals, mu = 0, conf.level = 0.95)
+
+hsl=matrix(c(Normalitas$p.value,Homogenitas$p.value,Autokorelasi.Spasial$p.value,Nilai.Tengah$p.value),nrow=4,byrow=TRUE)
+hsl=as.data.frame(hsl)
+colnames(hsl)=c("P-value")
+rownames(hsl)=c("Kenormalan","Homogenitas","Autokorelasi Spasial","Nilai tengah")
+hsl
+```
+Terdapat pelanggaran asumsi autokorelasi spasial global sehingga akan digunakan model regresi spasial. Hal tersebut diketahui bahwa p-value uji autokorelasi spasial <5%
+
+## Pembuatan model Dependensi Spasial
+### Pengujian uji LM-Model
+```{r}
+ww = W.knn.s
+model <- lm.LMtests(ols2,listw=ww,zero.policy = TRUE, test=c("LMerr","RLMerr","LMlag","RLMlag","SARMA"))
+summary(model)
+```
+Pada Uji LM pada taraf 5%, diketahui nyata pada LMlag, RLMLag, dan SARMA, sehingga kemungkinan modelnya adalah SAR atau SARMA.
+
+### Pengujian autokorelasi pada setiap peubah
+```{r}
+my=moran.test(rs$y, ww ,alternative="greater", zero.policy = TRUE)
+mx1=moran.test(rs$x1, ww ,alternative="greater", zero.policy = TRUE)
+mx2=moran.test(rs$x2, ww ,alternative="greater", zero.policy = TRUE)
+mx3=moran.test(rs$x3, ww ,alternative="greater", zero.policy = TRUE)
+mx4=moran.test(rs$x4, ww ,alternative="greater", zero.policy = TRUE)
+mx5=moran.test(rs$x5, ww ,alternative="greater", zero.policy = TRUE)
+mx7=moran.test(rs$x7, ww ,alternative="greater", zero.policy = TRUE)
+mx9=moran.test(rs$x9, ww ,alternative="greater", zero.policy = TRUE)
+mx11=moran.test(rs$x11, ww ,alternative="greater", zero.policy = TRUE)
+
+hsl2=matrix(c(my$p.value,mx1$p.value,mx2$p.value,mx3$p.value,mx4$p.value,mx5$p.value,mx7$p.value,mx9$p.value,mx11$p.value),nrow=9,byrow=TRUE)
+hsl2=as.data.frame(hsl2)
+colnames(hsl2)=c("P-value")
+rownames(hsl2)=c("y","x1","x2","x3","x4","x5","x7","x9","x11")
+hsl2
+```
+Berdasarkan pengujian autokorelasi spasial, terdapat autokorelasi pada peubah y,x2,x3,x4,x5,dan x7 sehingga akan dicoba pula model regresi durbin 
+
+### Model SAR
+```{r}
+SAR <- lagsarlm(y~x1+x2+x3+x4+x5+x7+x9+x11, data = rs, listw = ww, zero.policy = TRUE)
+summary(SAR)
+
+SAR1 <- errorsarlm(y~x1+x2+x3+x4+x5+x7+x9+x11, data = rs, listw = ww, zero.policy = TRUE)
+summary(SAR1)
+```
+Output di atas menunjukkan bahwa koefisien Rho signifikan pada taraf nyata 5%. AIC model SAR adalah sebesar 167.58 
+
+### Model SARMA
+```{r}
+SARMA <- sacsarlm(y~x1+x2+x3+x4+x5+x7+x9+x11, data = rs, listw = ww, zero.policy = TRUE)
+summary(SARMA)
+```
+Output di atas menunjukkan bahwa koefisien Rho signifikan pada taraf nyata 5%, tetapi nilai lamda belum signifikan mada taraf 5%. AIC model SARMA adalah sebesar 169.51.
+
+### Model Regresi Durbin
+```{r}
+#SDM=errorsarlm(y~x1+x2+x3+x4+x5+x7+x9+x11, data = rs, listw = ww, etype="mixed");
+#summary(SDM)
+```
+```{r}
+sem<-errorsarlm(y~x1+x2+x3+x4+x5+x7+x9+x11, data = rs, listw = ww)
+summary(sem)
+```
+
+
+### Model terbaik
+```{r}
+cbind.data.frame(AIC(ols2),AIC(SAR),AIC(SARMA))
+```
+
+```{r}
+library(lmtest)
+#Sisaan menyebar normal
+Normalitas=shapiro.test(SAR$residuals)
+
+#Sisaan homogen
+Homogenitas=lmtest::bptest(SAR)
+
+#Autokorelasi spasial
+Autokorelasi.Spasial=lm.morantest(SAR, listw=W.knn.s, alternative="two.sided", zero.policy = TRUE)
+
+#Sisaan berada di nilai tengah 0
+Nilai.Tengah=t.test(SAR$residuals, mu = 0, conf.level = 0.95)
+
+hsl3=matrix(c(Normalitas$p.value,Homogenitas$p.value,Autokorelasi.Spasial$p.value,Nilai.Tengah$p.value),nrow=4,byrow=TRUE)
+hsl3=as.data.frame(hsl3)
+colnames(hsl3)=c("P-value")
+rownames(hsl3)=c("Kenormalan","Homogenitas","Autokorelasi Spasial","Nilai tengah")
+hsl3
+```
+
