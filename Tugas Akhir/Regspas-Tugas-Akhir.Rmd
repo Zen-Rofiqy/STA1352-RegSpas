@@ -353,7 +353,7 @@ ggplot(data, aes(x="",
        title = "X11") + theme1.1 
 
 chart <-
-  plot_grid(y, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11,
+  plot_grid(y, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10,
             nrow=2)
 chart
 
@@ -382,7 +382,7 @@ corrplot(m, method = 'color',  addCoef.col="black",  diag=FALSE, type='lower',
 ```{r dpi=300, fig.height = 7.5, fig.width = 7.5, fig.align = "center", message = FALSE, warning=FALSE}
 ## Corr plot
 install_load('metan')
-plot(corr_coef(data[,5:ncol(data)]), reorder = FALSE)
+plot(corr_coef(data[,5:(ncol(data)-1)]), reorder = FALSE)
 ```
 
 ```{r, include=FALSE, echo=FALSE}
@@ -391,7 +391,7 @@ png(paste(export.chart, "/02_Corrplot.png", sep=""),
     height = 7.5*300, width = 7.5*300, res=300)
 
 # Plot 
-plot(corr_coef(data[,5:ncol(data)]), reorder = FALSE)
+plot(corr_coef(data[,5:(ncol(data)-1)]), reorder = FALSE)
 
 # Menyimpan plot sebagai file PNG
 dev.off() # Menutup file PNG
