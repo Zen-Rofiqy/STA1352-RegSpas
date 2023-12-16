@@ -345,6 +345,9 @@ chart <-
   plot_grid(y, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11,
             nrow=2)
 chart
+
+ggsave("01_Sebaran Data.png", chart, path = export.chart,
+        dpi = 300, height = 20, width = 40)
 ```
 
 ## Boxplot of Variables
