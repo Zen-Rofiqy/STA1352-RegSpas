@@ -52,6 +52,12 @@ path <- function(){
 #Copy r path, paste ke var yang diinginkan
 ```
 
+```{r , include=FALSE, echo=FALSE, warning=FALSE, message = FALSE}
+#Set Working Directory
+require("knitr")
+opts_knit$set(root.dir = "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/4. Regresi Spasial/Tugas Akhir")
+```
+
 ```{r}
 #Export chart
 export.chart <- "C:/Users/Fathan/Documents/Obsidian Vault/2. Kuliah/Smt 5/4. Regresi Spasial/Tugas Akhir/Chart"
@@ -69,6 +75,9 @@ install_load("raster","spdep","sp","readxl","openxlsx","rgdal","corrplot","DescT
 
 ```{r}
 raw.data <- import("https://raw.githubusercontent.com/Zen-Rofiqy/STA1352-RegSpas/main/Tugas%20Akhir/Data.csv")
+peta <- readOGR(dsn ="Sumut", layer = "Sumatera_Utara_ADMIN_BPS")
+peta <- peta[-which(peta@data$Kabupaten == "Danau Toba"), ]
+
 datatable(raw.data, filter = 'top', 
           options = list(pageLength = 5))
 ```
@@ -87,6 +96,7 @@ Tidak ada masalah dalam tipe data.
 
 ```{r}
 sum(is.na(raw.data))
+raw.data[!complete.cases(raw.data),]
 ```
 
 Tidak ada data kosong.
