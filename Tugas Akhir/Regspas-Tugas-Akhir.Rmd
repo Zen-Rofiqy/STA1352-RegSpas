@@ -365,20 +365,36 @@ ggsave("01_Sebaran Data.png", chart, path = export.chart,
 
 > Correlation Plot
 
-```{r dpi=300, fig.height = 15, fig.width = 15, fig.align = "center", message = FALSE, warning=FALSE}
+```{r dpi=300, fig.height = 10, fig.width = 10, fig.align = "center", message = FALSE, warning=FALSE}
 install_load('scales')
 m <- cor(data[,5:ncol(data)]) #Membuat matriks korelasi
 
-colors <- alpha(colorRampPalette(c("#bba58b", #Warna Bawah
-                                   "#e4e4e4", #Warna Tengah
-                                   "#75bfc8"))(10), #Warna Atas
+colors <- alpha(colorRampPalette(c("#D89534", #Warna Bawah
+                                   "#DEDBCE", #Warna Tengah
+                                   "#4EC2C1"))(10), #Warna Atas
                                    alpha = 0.95) #Transparan
 
 #Corrplot Elips
 corrplot(m, method = 'ellipse', type='lower', order='original', col=colors)
 #Corrplot Angka
 corrplot(m, add=TRUE, method = 'number', type='upper', order='original',
-         tl.pos = "lt", tl.col = "#78b1b0", col=colors)
+         tl.pos = "lt", tl.col = "#4EC2C1", col=colors)
+```
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/02_Corrplot.png", sep=""),
+    height = 10*300, width = 10*300, res=300)
+
+# Plot 
+#Corrplot Elips
+corrplot(m, method = 'ellipse', type='lower', order='original', col=colors)
+#Corrplot Angka
+corrplot(m, add=TRUE, method = 'number', type='upper', order='original',
+         tl.pos = "lt", tl.col = "#4EC2C1", col=colors)
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
 ```
 
 > Scatterplot
@@ -386,6 +402,18 @@ corrplot(m, add=TRUE, method = 'number', type='upper', order='original',
 ```{r dpi=300, fig.height = 10, fig.width = 20, fig.align = "center", message = FALSE, warning=FALSE}
 install_load('DescTools')
 pairs(m, pch = 19, lower.panel = NULL, col = "#37B883")
+```
+
+```{r, include=FALSE, echo=FALSE}
+#Export Chart
+png(paste(export.chart, "/03_Scatterplot.png", sep=""),
+    height = 10*300, width = 10*300, res=300)
+
+# Plot 
+pairs(m, pch = 19, lower.panel = NULL, col = "#37B883")
+
+# Menyimpan plot sebagai file PNG
+dev.off() # Menutup file PNG
 ```
 
 ## Poverty Heatmap (%)
