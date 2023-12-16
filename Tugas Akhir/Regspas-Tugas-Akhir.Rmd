@@ -120,6 +120,17 @@ theme1.1 <- list(
         panel.grid.minor = element_blank(),
         axis.line = element_line(linewidth = 1, colour = "black"))
         ) 
+theme3.2 <- list(
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        text = element_text(size = 30),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.background = element_rect(fill = 'transparent', color=NA),
+        plot.background = element_rect(fill='transparent', color=NA),
+        panel.grid.major = element_line(colour = "grey90"),
+        axis.line = element_line(linewidth = 1.5, colour = "black")
+        ) 
+)
 ```
 
 ## Sebaran data peubah y dan x
@@ -350,19 +361,11 @@ ggsave("01_Sebaran Data.png", chart, path = export.chart,
         dpi = 300, height = 20, width = 40)
 ```
 
-## Boxplot of Variables
+## Hubungan antar peubah
 
-```{r}
-for (i in 5:ncol(data) ) {
-  boxplot(data[,i],horizontal=TRUE, main = paste("Sebaran dari ",colnames(data)[i]))
-}
-```
-
-## Pairs
-
-```{r}
-library(DescTools)
-pairs(data[,5:ncol(data)], pch = 19, lower.panel = NULL)
+```{r dpi=300, fig.height = 10, fig.width = 20, fig.align = "center", message = FALSE, warning=FALSE}
+install_load('DescTools')
+pairs(data[,5:ncol(data)], pch = 19, lower.panel = NULL, col = "#37B883")
 ```
 
 ## Correlation Matrix
